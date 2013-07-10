@@ -1,0 +1,22 @@
+{
+  "background": {
+    "persistent": false,
+    "page": "background.html"
+  },
+  "browser_action": {
+    "default_icon": "fmc.png"
+  },
+  "description": "FetLife Mailbox Checker",
+  "icons": {
+    "128": "icon_128.png"
+  },
+  "name": "FMC",
+  "permissions": [
+    "alarms",
+    "tabs",
+    "webNavigation",
+    "*://*.fetlife.com/"
+   ],
+  "version": "0.1.0",
+  "manifest_version": 2
+}
