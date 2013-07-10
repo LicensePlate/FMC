@@ -244,7 +244,7 @@ function goToInbox() {
         return;
       }
     }
-    chrome.tabs.create({url: "https://fetlife.com/conversations/all"});
+    chrome.tabs.create({url: "https://fetlife.com/conversations"});
   });
 }
 
