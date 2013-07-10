@@ -6,7 +6,7 @@
   "browser_action": {
     "default_icon": "fmc.png"
   },
-  "description": "FetLife Mailbox Checker",
+  "description": "FL Mailbox Checker",
   "icons": {
     "128": "icon_128.png"
   },
@@ -15,8 +15,8 @@
     "alarms",
     "tabs",
     "webNavigation",
-    "*://*.fetlife.com/"
+    "https://fetlife.com/"
    ],
-  "version": "0.1.0",
+  "version": "0.1.1",
   "manifest_version": 2
 }
