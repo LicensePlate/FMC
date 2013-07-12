@@ -17,8 +17,16 @@ var loadingAnimation = new LoadingAnimation();
 var oldChromeVersion = !chrome.runtime;
 var requestTimerId;
 
-function getMailUrl() {
-  return "https://fetlife.com/polling/counts?fetch=new_messages%2Cats";
+function getCheckUrl() { return "https://fetlife.com/polling/counts?fetch=new_messages%2Cats"; }
+function getDestUrl() { 
+    if (!localStorage.hasOwnProperty('iconText'))   
+        return "https://fetlife.com/";
+    if (localStorage.iconText == '') 
+        return "https://fetlife.com/";
+    if (localStorage.iconText == '@') 
+        return"https://fetlife.com/ats"
+    //else
+        return "https://fetlife.com/conversations"; 
 }
 
 // Identifier used to debug the possibility of multiple instances of the
@@ -32,12 +40,12 @@ function getInstanceId() {
 function getFeedUrl() {
   // "zx" is a Gmail query parameter that is expected to contain a random
   // string and may be ignored/stripped.
-  return getMailUrl();
+  return getCheckUrl();
 }
 
 function isMailUrl(url) {
   // Return whether the URL starts with the Gmail prefix.
-  return url.indexOf("https://fetlife.com/conversations") == 0;
+  return url.indexOf(getDestUrl()) == 0;
 }
 
 // A "loading" animation displayed while we wait for the first response.
@@ -241,7 +249,7 @@ function goToInbox() {
         return;
       }
     }
-    chrome.tabs.create({url: "https://fetlife.com/conversations"});
+    chrome.tabs.create({url: getDestUrl()});
   });
 }
 
@@ -290,7 +298,7 @@ if (oldChromeVersion) {
 var filters = {
   // TODO(aa): Cannot use urlPrefix because all the url fields lack the protocol
   // part. See crbug.com/140238.
-  url: [{urlContains: getMailUrl().replace(/^https?\:\/\//, '')}]
+  url: [{urlContains: getCheckUrl().replace(/^https?\:\/\//, '')}]
 };
 
 function onNavigate(details) {
