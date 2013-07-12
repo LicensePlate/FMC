@@ -18,7 +18,7 @@ var oldChromeVersion = !chrome.runtime;
 var requestTimerId;
 
 function getMailUrl() {
-  return "https://fetlife.com/polling/counts?fetch=new_messages";
+  return "https://fetlife.com/polling/counts?fetch=new_messages%2Cats";
 }
 
 // Identifier used to debug the possibility of multiple instances of the
@@ -83,16 +83,14 @@ LoadingAnimation.prototype.stop = function() {
 }
 
 function updateIcon() {
-  if (!localStorage.hasOwnProperty('unreadCount')) {
+  if (!localStorage.hasOwnProperty('iconText')) {
     chrome.browserAction.setIcon({path:"fmc.png"});
     chrome.browserAction.setBadgeBackgroundColor({color:[190, 190, 190, 230]});
     chrome.browserAction.setBadgeText({text:"..."});
   } else {
     chrome.browserAction.setIcon({path: "fmc_live.png"});
     chrome.browserAction.setBadgeBackgroundColor({color:[208, 0, 24, 255]});
-    chrome.browserAction.setBadgeText({
-      text: localStorage.unreadCount != "0" ? localStorage.unreadCount : ""
-    });
+    chrome.browserAction.setBadgeText({ text: localStorage.iconText });
   }
 }
 
@@ -133,13 +131,13 @@ function startRequest(params) {
     loadingAnimation.start();
 
   getInboxCount(
-    function(count) {
+    function(data) {
       stopLoadingAnimation();
-      updateUnreadCount(count);
+      updateUnreadCount(data);
     },
     function() {
       stopLoadingAnimation();
-      delete localStorage.unreadCount;
+      delete localStorage.iconText;
       updateIcon();
     }
   );
@@ -151,11 +149,11 @@ function getInboxCount(onSuccess, onError) {
     xhr.abort();  // synchronously calls onreadystatechange
   }, requestTimeout);
 
-  function handleSuccess(count) {
+  function handleSuccess(data) {
     localStorage.requestFailureCount = 0;
     window.clearTimeout(abortTimerId);
     if (onSuccess)
-      onSuccess(count);
+      onSuccess(data);
   }
 
   var invokedErrorCallback = false;
@@ -176,7 +174,7 @@ function getInboxCount(onSuccess, onError) {
         try {
           var response = JSON.parse(xhr.response);
           if (response && response.hasOwnProperty("new_messages"))
-            handleSuccess(response.new_messages);
+            handleSuccess(response);
         } catch (e) { console.error(e); }
       } 
     };
@@ -193,11 +191,10 @@ function getInboxCount(onSuccess, onError) {
   }
 }
 
-function updateUnreadCount(count) {
-  console.log(localStorage.unreadCount);
-  var changed = localStorage.unreadCount != count;
-  localStorage.unreadCount = count;
-  console.log(localStorage.unreadCount);
+function updateUnreadCount(data) {
+  var iconText = data.new_messages ? data.new_messages : data.ats ? '@' : '';
+  var changed = iconText == localStorage.iconText;
+  localStorage.iconText = iconText;
   updateIcon();
   if (changed)
     animateFlip();
